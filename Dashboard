@@ -1,0 +1,1860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SiteForge — AI Website Builder & Marketplace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: #2a2a3e;
+    --accent: #7c5cfc;
+    --accent2: #00d4ff;
+    --gold: #f0c040;
+    --green: #00e676;
+    --red: #ff4757;
+    --text: #e8e8f0;
+    --muted: #7a7a9a;
+    --card: #16162080;
+    --font-display: 'Syne', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --radius: 12px;
+    --glow: 0 0 40px rgba(124,92,252,0.15);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ---- LAYOUT ---- */
+  .app { display: flex; height: 100vh; }
+  .sidebar {
+    width: 220px;
+    min-width: 220px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow-y: auto;
+    z-index: 10;
+  }
+  .main { flex: 1; overflow-y: auto; padding: 28px 32px; }
+
+  /* ---- SIDEBAR ---- */
+  .logo {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .logo-text { font-family: var(--font-display); font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
+  .logo-badge {
+    font-family: var(--font-mono); font-size: 9px;
+    background: var(--accent); color: #fff;
+    padding: 2px 6px; border-radius: 4px; margin-left: auto;
+  }
+  .nav-section { padding: 12px 12px 4px; }
+  .nav-label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; padding: 0 8px 6px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px; border-radius: 8px;
+    cursor: pointer; color: var(--muted);
+    font-size: 13px; font-weight: 500;
+    transition: all 0.15s;
+    margin-bottom: 2px;
+    border: none; background: none; width: 100%; text-align: left;
+  }
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+  .nav-item.active { background: rgba(124,92,252,0.15); color: var(--accent); }
+  .nav-item .nav-icon { font-size: 15px; width: 18px; text-align: center; }
+  .nav-badge { margin-left: auto; background: var(--accent); color: #fff; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px; }
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .user-card {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px; background: var(--surface2);
+    border-radius: 8px; cursor: pointer;
+  }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; }
+  .user-info { flex: 1; }
+  .user-name { font-size: 13px; font-weight: 600; }
+  .user-plan { font-size: 11px; color: var(--gold); }
+
+  /* ---- HEADER ---- */
+  .page-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 28px;
+  }
+  .page-title { font-family: var(--font-display); font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+  .page-sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .header-actions { display: flex; gap: 10px; align-items: center; }
+
+  /* ---- BUTTONS ---- */
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 9px 18px; border-radius: 8px;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    border: none; transition: all 0.15s; text-decoration: none;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #6a4de8; transform: translateY(-1px); }
+  .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { background: var(--border); }
+  .btn-success { background: rgba(0,230,118,0.15); color: var(--green); border: 1px solid rgba(0,230,118,0.3); }
+  .btn-danger { background: rgba(255,71,87,0.15); color: var(--red); border: 1px solid rgba(255,71,87,0.3); }
+  .btn-sm { padding: 6px 12px; font-size: 12px; }
+  .btn-gold { background: linear-gradient(135deg, #f0c040, #e6a020); color: #1a1000; }
+
+  /* ---- CARDS ---- */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .card-title { font-size: 14px; font-weight: 600; }
+  .card-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* ---- GRID ---- */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+  /* ---- STATS ---- */
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  }
+  .stat-card.purple::before { background: linear-gradient(90deg, var(--accent), transparent); }
+  .stat-card.cyan::before { background: linear-gradient(90deg, var(--accent2), transparent); }
+  .stat-card.gold::before { background: linear-gradient(90deg, var(--gold), transparent); }
+  .stat-card.green::before { background: linear-gradient(90deg, var(--green), transparent); }
+  .stat-value { font-family: var(--font-display); font-size: 28px; font-weight: 800; margin: 8px 0 4px; }
+  .stat-change { font-size: 12px; color: var(--green); display: flex; align-items: center; gap: 4px; }
+  .stat-change.down { color: var(--red); }
+
+  /* ---- TABS ---- */
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+  .tab {
+    padding: 10px 16px; font-size: 13px; font-weight: 500; color: var(--muted);
+    cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px;
+    background: none; border-top: none; border-left: none; border-right: none;
+    transition: all 0.15s;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ---- PAGES ---- */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ---- AI BUILDER ---- */
+  .builder-layout { display: grid; grid-template-columns: 380px 1fr; gap: 20px; height: calc(100vh - 140px); }
+  .builder-panel { display: flex; flex-direction: column; gap: 16px; overflow-y: auto; }
+  .builder-preview {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .preview-bar {
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .preview-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .preview-url {
+    flex: 1;
+    background: var(--bg);
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    margin: 0 8px;
+  }
+  .preview-frame { flex: 1; border: none; background: #fff; width: 100%; }
+  .prompt-area {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 13px;
+    resize: none;
+    min-height: 80px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .prompt-area:focus { border-color: var(--accent); }
+  .generate-btn {
+    width: 100%; padding: 12px;
+    background: linear-gradient(135deg, var(--accent), #5a3de0);
+    border: none; border-radius: 8px;
+    color: #fff; font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .generate-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(124,92,252,0.4); }
+  .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* AI Streaming */
+  .ai-status {
+    padding: 10px 14px;
+    background: rgba(124,92,252,0.1);
+    border: 1px solid rgba(124,92,252,0.3);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--accent);
+    display: none;
+    align-items: center;
+    gap: 8px;
+  }
+  .ai-status.visible { display: flex; }
+  .ai-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+
+  /* ---- WEBSITE CARDS ---- */
+  .site-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+  .site-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .site-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--glow); }
+  .site-thumb {
+    height: 150px;
+    background: linear-gradient(135deg, var(--surface2), var(--bg));
+    position: relative;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .site-thumb iframe { width: 200%; height: 200%; transform: scale(0.5); transform-origin: top left; border: none; pointer-events: none; }
+  .site-thumb-placeholder { text-align: center; color: var(--muted); }
+  .site-thumb-placeholder .icon { font-size: 32px; margin-bottom: 8px; }
+  .site-info { padding: 14px; }
+  .site-name { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+  .site-url { font-family: var(--font-mono); font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+  .site-meta { display: flex; justify-content: space-between; align-items: center; }
+  .site-status { font-size: 11px; padding: 3px 8px; border-radius: 20px; font-weight: 600; }
+  .site-status.live { background: rgba(0,230,118,0.15); color: var(--green); }
+  .site-status.draft { background: rgba(240,192,64,0.15); color: var(--gold); }
+  .site-status.listed { background: rgba(0,212,255,0.15); color: var(--accent2); }
+  .site-actions { display: flex; gap: 6px; }
+
+  /* ---- MARKETPLACE ---- */
+  .listing-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: all 0.2s;
+  }
+  .listing-card:hover { border-color: var(--accent); }
+  .listing-header { padding: 16px; border-bottom: 1px solid var(--border); }
+  .listing-price { font-family: var(--font-display); font-size: 24px; font-weight: 800; color: var(--gold); }
+  .listing-body { padding: 16px; }
+  .listing-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
+  .listing-stat { text-align: center; background: var(--surface2); padding: 8px; border-radius: 6px; }
+  .listing-stat-val { font-weight: 700; font-size: 15px; }
+  .listing-stat-lbl { font-size: 10px; color: var(--muted); }
+
+  /* ---- TABLE ---- */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 11px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+  }
+  td { padding: 12px 14px; border-bottom: 1px solid rgba(42,42,62,0.5); font-size: 13px; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* ---- FORM ---- */
+  .form-group { margin-bottom: 16px; }
+  .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .form-input, .form-select, .form-textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); }
+  .form-select option { background: var(--surface2); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  /* ---- BADGE ---- */
+  .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .badge-purple { background: rgba(124,92,252,0.2); color: var(--accent); }
+  .badge-cyan { background: rgba(0,212,255,0.2); color: var(--accent2); }
+  .badge-gold { background: rgba(240,192,64,0.2); color: var(--gold); }
+  .badge-green { background: rgba(0,230,118,0.2); color: var(--green); }
+  .badge-red { background: rgba(255,71,87,0.2); color: var(--red); }
+
+  /* ---- MODAL ---- */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    display: none; align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    width: 100%; max-width: 560px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideUp 0.2s ease;
+  }
+  @keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .modal-title { font-family: var(--font-display); font-size: 20px; font-weight: 800; }
+  .modal-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 20px; padding: 4px; }
+  .modal-close:hover { color: var(--text); }
+
+  /* ---- NOTIFICATIONS ---- */
+  .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 200; display: flex; flex-direction: column; gap: 8px; }
+  .toast {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13px; font-weight: 500;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    animation: slideIn 0.3s ease;
+    min-width: 260px;
+  }
+  @keyframes slideIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+  .toast.success { border-left: 3px solid var(--green); }
+  .toast.error { border-left: 3px solid var(--red); }
+  .toast.info { border-left: 3px solid var(--accent); }
+
+  /* ---- ANALYTICS ---- */
+  .chart-bar-wrap { display: flex; gap: 4px; align-items: flex-end; height: 80px; }
+  .chart-bar { flex: 1; background: linear-gradient(to top, var(--accent), var(--accent2)); border-radius: 3px 3px 0 0; min-height: 4px; transition: all 0.3s; opacity: 0.7; }
+  .chart-bar:hover { opacity: 1; }
+  .chart-labels { display: flex; gap: 4px; margin-top: 4px; }
+  .chart-label { flex: 1; text-align: center; font-size: 10px; color: var(--muted); }
+
+  /* ---- CODE VIEW ---- */
+  .code-block {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: #a8b5cc;
+    overflow-x: auto;
+    max-height: 200px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  /* ---- PROGRESS ---- */
+  .progress-bar { background: var(--surface2); border-radius: 20px; height: 6px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 0.5s; }
+
+  /* ---- EMPTY STATE ---- */
+  .empty-state {
+    text-align: center; padding: 60px 20px;
+    color: var(--muted);
+  }
+  .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+  .empty-state h3 { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+  .empty-state p { font-size: 13px; max-width: 300px; margin: 0 auto 20px; }
+
+  /* ---- SCROLLBAR ---- */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+  /* ---- INLINE TAG ---- */
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; background: var(--surface2); color: var(--muted); margin: 2px; }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .sidebar { width: 60px; min-width: 60px; }
+    .logo-text, .logo-badge, .nav-item span, .nav-badge, .user-info { display: none; }
+    .nav-label { display: none; }
+    .main { padding: 16px; }
+    .grid-4 { grid-template-columns: 1fr 1fr; }
+    .builder-layout { grid-template-columns: 1fr; }
+  }
+
+  /* Divider */
+  .divider { height: 1px; background: var(--border); margin: 20px 0; }
+  .section-title { font-family: var(--font-display); font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+  .gap-12 { display: flex; flex-direction: column; gap: 12px; }
+
+  /* toggle */
+  .toggle { position: relative; display: inline-block; width: 36px; height: 20px; }
+  .toggle input { display: none; }
+  .toggle-slider { position: absolute; inset: 0; background: var(--surface2); border-radius: 20px; cursor: pointer; transition: background 0.2s; border: 1px solid var(--border); }
+  .toggle-slider::before { content: ''; position: absolute; width: 14px; height: 14px; background: var(--muted); border-radius: 50%; top: 2px; left: 2px; transition: all 0.2s; }
+  .toggle input:checked + .toggle-slider { background: var(--accent); border-color: var(--accent); }
+  .toggle input:checked + .toggle-slider::before { transform: translateX(16px); background: #fff; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="logo">
+      <div class="logo-icon">⚡</div>
+      <span class="logo-text">SiteForge</span>
+      <span class="logo-badge">PRO</span>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Main</div>
+      <button class="nav-item active" onclick="navigate('dashboard')">
+        <span class="nav-icon">📊</span><span>Dashboard</span>
+      </button>
+      <button class="nav-item" onclick="navigate('builder')">
+        <span class="nav-icon">🤖</span><span>AI Builder</span>
+        <span class="nav-badge">NEW</span>
+      </button>
+      <button class="nav-item" onclick="navigate('sites')">
+        <span class="nav-icon">🌐</span><span>My Sites</span>
+      </button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Marketplace</div>
+      <button class="nav-item" onclick="navigate('marketplace')">
+        <span class="nav-icon">🏪</span><span>Browse</span>
+      </button>
+      <button class="nav-item" onclick="navigate('listings')">
+        <span class="nav-icon">📋</span><span>My Listings</span>
+      </button>
+      <button class="nav-item" onclick="navigate('leads')">
+        <span class="nav-icon">👥</span><span>Buyer Leads</span>
+      </button>
+      <button class="nav-item" onclick="navigate('deals')">
+        <span class="nav-icon">🤝</span><span>Deals</span>
+      </button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Analytics</div>
+      <button class="nav-item" onclick="navigate('analytics')">
+        <span class="nav-icon">📈</span><span>Analytics</span>
+      </button>
+      <button class="nav-item" onclick="navigate('vault')">
+        <span class="nav-icon">🗄️</span><span>Data Vault</span>
+      </button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Account</div>
+      <button class="nav-item" onclick="navigate('settings')">
+        <span class="nav-icon">⚙️</span><span>Settings</span>
+      </button>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="avatar">X</div>
+        <div class="user-info">
+          <div class="user-name">Xabdiel</div>
+          <div class="user-plan">✦ Pro Plan</div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="main" id="mainContent">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Dashboard</div>
+          <div class="page-sub">Welcome back, Xabdiel — here's your empire at a glance.</div>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-secondary btn-sm" onclick="navigate('vault')">🗄️ Data Vault</button>
+          <button class="btn btn-primary" onclick="navigate('builder')">⚡ Build with AI</button>
+        </div>
+      </div>
+
+      <div class="grid-4" style="margin-bottom:20px">
+        <div class="stat-card purple">
+          <div class="card-label">Total Sites</div>
+          <div class="stat-value" id="stat-sites">0</div>
+          <div class="stat-change">📁 in your portfolio</div>
+        </div>
+        <div class="stat-card cyan">
+          <div class="card-label">Active Listings</div>
+          <div class="stat-value" id="stat-listings">0</div>
+          <div class="stat-change">🏪 on marketplace</div>
+        </div>
+        <div class="stat-card gold">
+          <div class="card-label">Total Value</div>
+          <div class="stat-value" id="stat-value">$0</div>
+          <div class="stat-change">💰 portfolio value</div>
+        </div>
+        <div class="stat-card green">
+          <div class="card-label">Buyer Leads</div>
+          <div class="stat-value" id="stat-leads">0</div>
+          <div class="stat-change">👥 interested buyers</div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:20px">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Recent Activity</div>
+            <span class="badge badge-purple">Live</span>
+          </div>
+          <div id="activity-feed" class="gap-12">
+            <div style="text-align:center;color:var(--muted);padding:20px;font-size:13px">No activity yet. Build your first site!</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Traffic This Week</div>
+          </div>
+          <div class="chart-bar-wrap" id="weekChart">
+            <div class="chart-bar" style="height:30%"></div>
+            <div class="chart-bar" style="height:60%"></div>
+            <div class="chart-bar" style="height:45%"></div>
+            <div class="chart-bar" style="height:80%"></div>
+            <div class="chart-bar" style="height:55%"></div>
+            <div class="chart-bar" style="height:90%"></div>
+            <div class="chart-bar" style="height:70%"></div>
+          </div>
+          <div class="chart-labels">
+            <div class="chart-label">Mon</div><div class="chart-label">Tue</div>
+            <div class="chart-label">Wed</div><div class="chart-label">Thu</div>
+            <div class="chart-label">Fri</div><div class="chart-label">Sat</div>
+            <div class="chart-label">Sun</div>
+          </div>
+          <div style="margin-top:12px;font-size:12px;color:var(--muted)">Connect your sites to see real traffic data.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Quick Actions</div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-primary" onclick="navigate('builder')">🤖 Generate New Site with AI</button>
+          <button class="btn btn-secondary" onclick="openListSiteModal()">📋 List a Site for Sale</button>
+          <button class="btn btn-secondary" onclick="navigate('leads')">👥 View Buyer Leads</button>
+          <button class="btn btn-secondary" onclick="navigate('vault')">🗄️ Open Data Vault</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI BUILDER -->
+    <div class="page" id="page-builder">
+      <div class="page-header">
+        <div>
+          <div class="page-title">AI Website Builder</div>
+          <div class="page-sub">Describe your website and Claude will generate it instantly.</div>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-secondary btn-sm" onclick="clearBuilder()">🗑️ Clear</button>
+          <button class="btn btn-success btn-sm" id="saveGeneratedBtn" onclick="saveGeneratedSite()" style="display:none">💾 Save to Portfolio</button>
+        </div>
+      </div>
+
+      <div class="builder-layout">
+        <div class="builder-panel">
+          <div class="card">
+            <div class="card-title" style="margin-bottom:12px">🎯 Site Configuration</div>
+            <div class="form-group">
+              <label class="form-label">Site Name</label>
+              <input class="form-input" id="siteName" placeholder="e.g. Miami Realty Pro" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <select class="form-select" id="siteCategory">
+                <option>E-commerce</option>
+                <option>Real Estate</option>
+                <option>Restaurant</option>
+                <option>Portfolio</option>
+                <option>SaaS / Tech</option>
+                <option>Healthcare</option>
+                <option>Law Firm</option>
+                <option>Blog / Media</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Estimated Value</label>
+              <input class="form-input" id="siteValue" placeholder="e.g. 5000" type="number" />
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title" style="margin-bottom:12px">✍️ Describe Your Website</div>
+            <textarea class="prompt-area" id="sitePrompt" placeholder="e.g. A luxury real estate website for Miami properties. Include hero section, featured listings, testimonials, contact form. Use dark theme with gold accents. Very professional and high-end."></textarea>
+            <div class="ai-status" id="aiStatus">
+              <div class="ai-dot"></div>
+              <span id="aiStatusText">Claude is generating your website…</span>
+            </div>
+            <button class="generate-btn" id="generateBtn" onclick="generateSite()">
+              ⚡ Generate with AI
+            </button>
+          </div>
+
+          <div class="card" id="generatedCodePanel" style="display:none">
+            <div class="card-header">
+              <div class="card-title">📄 Generated Code</div>
+              <button class="btn btn-sm btn-secondary" onclick="copyCode()">📋 Copy</button>
+            </div>
+            <div class="code-block" id="codePreview"><!-- code here --></div>
+          </div>
+        </div>
+
+        <div class="builder-preview">
+          <div class="preview-bar">
+            <div class="preview-dot" style="background:#ff5f57"></div>
+            <div class="preview-dot" style="background:#ffbd2e"></div>
+            <div class="preview-dot" style="background:#28c840"></div>
+            <div class="preview-url" id="previewUrl">about:blank — generate a site to preview it</div>
+            <button class="btn btn-sm btn-secondary" onclick="openFullPreview()" id="fullPreviewBtn" style="display:none">🔗 Open</button>
+          </div>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;background:var(--surface2)" id="previewPlaceholder">
+            <div style="text-align:center;color:var(--muted)">
+              <div style="font-size:48px;margin-bottom:12px">🤖</div>
+              <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px">Ready to Build</div>
+              <div style="font-size:12px">Describe your website and click Generate</div>
+            </div>
+          </div>
+          <iframe id="previewFrame" class="preview-frame" style="display:none;flex:1;height:100%"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <!-- MY SITES -->
+    <div class="page" id="page-sites">
+      <div class="page-header">
+        <div>
+          <div class="page-title">My Sites</div>
+          <div class="page-sub">All websites in your portfolio.</div>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-primary" onclick="navigate('builder')">⚡ Build New Site</button>
+        </div>
+      </div>
+      <div class="tabs">
+        <button class="tab active" onclick="filterSites('all', this)">All Sites</button>
+        <button class="tab" onclick="filterSites('live', this)">Live</button>
+        <button class="tab" onclick="filterSites('draft', this)">Draft</button>
+        <button class="tab" onclick="filterSites('listed', this)">Listed for Sale</button>
+      </div>
+      <div class="site-grid" id="siteGrid">
+        <div class="empty-state" style="grid-column:1/-1">
+          <div class="icon">🌐</div>
+          <h3>No sites yet</h3>
+          <p>Use the AI Builder to generate your first website in seconds.</p>
+          <button class="btn btn-primary" onclick="navigate('builder')">⚡ Build with AI</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MARKETPLACE -->
+    <div class="page" id="page-marketplace">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Marketplace</div>
+          <div class="page-sub">Browse websites listed for sale by other owners.</div>
+        </div>
+        <div class="header-actions">
+          <select class="form-select" style="width:140px" id="marketFilter" onchange="renderMarketplace()">
+            <option value="all">All Categories</option>
+            <option value="E-commerce">E-commerce</option>
+            <option value="Real Estate">Real Estate</option>
+            <option value="SaaS / Tech">SaaS / Tech</option>
+          </select>
+        </div>
+      </div>
+      <div id="marketplaceGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">
+        <div class="empty-state" style="grid-column:1/-1">
+          <div class="icon">🏪</div>
+          <h3>No listings yet</h3>
+          <p>List your own sites for sale to start the marketplace.</p>
+          <button class="btn btn-primary" onclick="openListSiteModal()">📋 List a Site</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MY LISTINGS -->
+    <div class="page" id="page-listings">
+      <div class="page-header">
+        <div>
+          <div class="page-title">My Listings</div>
+          <div class="page-sub">Sites you've listed for sale.</div>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-gold" onclick="openListSiteModal()">📋 + New Listing</button>
+        </div>
+      </div>
+      <div id="listingsTable">
+        <div class="empty-state">
+          <div class="icon">📋</div>
+          <h3>No listings yet</h3>
+          <p>List one of your sites to attract buyers.</p>
+          <button class="btn btn-gold" onclick="openListSiteModal()">📋 Create Listing</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BUYER LEADS -->
+    <div class="page" id="page-leads">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Buyer Leads</div>
+          <div class="page-sub">Interested buyers who contacted you.</div>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-primary" onclick="openAddLeadModal()">➕ Add Lead</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Buyer</th>
+                <th>Email</th>
+                <th>Interested In</th>
+                <th>Budget</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="leadsTableBody">
+              <tr><td colspan="7" style="text-align:center;color:var(--muted);padding:30px">No leads yet. They'll appear here when buyers contact you.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- DEALS -->
+    <div class="page" id="page-deals">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Deals</div>
+          <div class="page-sub">Track ongoing and closed website sales.</div>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-primary" onclick="openAddDealModal()">➕ New Deal</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px" id="dealColumns">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;padding:8px 12px;background:var(--surface2);border-radius:8px">🔵 Negotiating</div>
+          <div id="col-negotiating" class="gap-12"></div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;padding:8px 12px;background:var(--surface2);border-radius:8px">🟡 Due Diligence</div>
+          <div id="col-due-diligence" class="gap-12"></div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;padding:8px 12px;background:var(--surface2);border-radius:8px">🟢 Closed</div>
+          <div id="col-closed" class="gap-12"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANALYTICS -->
+    <div class="page" id="page-analytics">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Analytics</div>
+          <div class="page-sub">Performance across your portfolio.</div>
+        </div>
+      </div>
+      <div class="grid-4" style="margin-bottom:20px">
+        <div class="stat-card purple">
+          <div class="card-label">Total Page Views</div>
+          <div class="stat-value" id="an-views">—</div>
+        </div>
+        <div class="stat-card cyan">
+          <div class="card-label">Avg. Monthly Revenue</div>
+          <div class="stat-value" id="an-rev">—</div>
+        </div>
+        <div class="stat-card gold">
+          <div class="card-label">Listing Inquiries</div>
+          <div class="stat-value" id="an-inq">—</div>
+        </div>
+        <div class="stat-card green">
+          <div class="card-label">Deals Closed</div>
+          <div class="stat-value" id="an-deals">0</div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title" style="margin-bottom:16px">Portfolio Value Over Time</div>
+          <div class="chart-bar-wrap">
+            <div class="chart-bar" style="height:20%;background:linear-gradient(to top,var(--gold),#e6a020)"></div>
+            <div class="chart-bar" style="height:40%;background:linear-gradient(to top,var(--gold),#e6a020)"></div>
+            <div class="chart-bar" style="height:35%;background:linear-gradient(to top,var(--gold),#e6a020)"></div>
+            <div class="chart-bar" style="height:60%;background:linear-gradient(to top,var(--gold),#e6a020)"></div>
+            <div class="chart-bar" style="height:55%;background:linear-gradient(to top,var(--gold),#e6a020)"></div>
+            <div class="chart-bar" style="height:75%;background:linear-gradient(to top,var(--gold),#e6a020)"></div>
+            <div class="chart-bar" style="height:90%;background:linear-gradient(to top,var(--gold),#e6a020)"></div>
+          </div>
+          <div class="chart-labels">
+            <div class="chart-label">Jan</div><div class="chart-label">Feb</div>
+            <div class="chart-label">Mar</div><div class="chart-label">Apr</div>
+            <div class="chart-label">May</div><div class="chart-label">Jun</div>
+            <div class="chart-label">Jul</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:16px">Sites by Category</div>
+          <div id="categoryBreakdown" style="display:flex;flex-direction:column;gap:10px">
+            <div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">Build some sites to see breakdown.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DATA VAULT -->
+    <div class="page" id="page-vault">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Data Vault</div>
+          <div class="page-sub">All your data is stored right here in this platform — no external database needed.</div>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-secondary btn-sm" onclick="exportData()">📥 Export JSON</button>
+          <button class="btn btn-secondary btn-sm" onclick="importData()">📤 Import JSON</button>
+          <button class="btn btn-danger btn-sm" onclick="clearAllData()">🗑️ Clear All Data</button>
+        </div>
+      </div>
+
+      <div class="grid-4" style="margin-bottom:20px">
+        <div class="stat-card purple">
+          <div class="card-label">Sites Stored</div>
+          <div class="stat-value" id="vault-sites">0</div>
+        </div>
+        <div class="stat-card cyan">
+          <div class="card-label">Listings</div>
+          <div class="stat-value" id="vault-listings">0</div>
+        </div>
+        <div class="stat-card gold">
+          <div class="card-label">Leads</div>
+          <div class="stat-value" id="vault-leads">0</div>
+        </div>
+        <div class="stat-card green">
+          <div class="card-label">Deals</div>
+          <div class="stat-value" id="vault-deals">0</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🔍 Raw Data Explorer</div>
+          <select class="form-select" style="width:200px" id="vaultTable" onchange="renderVaultData()">
+            <option value="sites">Sites</option>
+            <option value="listings">Listings</option>
+            <option value="leads">Leads</option>
+            <option value="deals">Deals</option>
+          </select>
+        </div>
+        <div class="code-block" id="vaultDataView" style="max-height:400px">Select a table to view data.</div>
+      </div>
+
+      <div style="margin-top:16px" class="card">
+        <div class="card-title" style="margin-bottom:12px">ℹ️ About the Data Vault</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.8">
+          All data is stored in your <strong style="color:var(--text)">browser's localStorage</strong> — nothing leaves your device unless you export it.
+          Your sites (including the full HTML code), listings, buyer leads, and deals are all persisted here.
+          Use Export to back up or transfer your data. Use Import to restore from a backup.
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="page" id="page-settings">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Settings</div>
+          <div class="page-sub">Configure your SiteForge account.</div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title" style="margin-bottom:16px">👤 Profile</div>
+          <div class="form-group">
+            <label class="form-label">Display Name</label>
+            <input class="form-input" id="set-name" placeholder="Your name" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input class="form-input" id="set-email" placeholder="your@email.com" type="email" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Business Name</label>
+            <input class="form-input" id="set-biz" placeholder="e.g. The Original Granite & Cabinets" />
+          </div>
+          <button class="btn btn-primary" onclick="saveSettings()">Save Profile</button>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:16px">🏪 Marketplace Profile</div>
+          <div class="form-group">
+            <label class="form-label">Seller Bio</label>
+            <textarea class="form-textarea" id="set-bio" rows="3" placeholder="Tell buyers about you..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Preferred Contact</label>
+            <input class="form-input" id="set-contact" placeholder="Email or phone" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Payment Methods Accepted</label>
+            <input class="form-input" id="set-payment" placeholder="e.g. PayPal, Escrow.com, Wire" />
+          </div>
+          <button class="btn btn-primary" onclick="saveSettings()">Save</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL: List Site -->
+<div class="modal-overlay" id="modal-list">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📋 List Site for Sale</div>
+      <button class="modal-close" onclick="closeModal('modal-list')">×</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Select Site</label>
+      <select class="form-select" id="ml-site"></select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Asking Price ($)</label>
+        <input class="form-input" id="ml-price" type="number" placeholder="e.g. 5000" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Monthly Revenue ($)</label>
+        <input class="form-input" id="ml-revenue" type="number" placeholder="e.g. 500" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Monthly Traffic (visits)</label>
+      <input class="form-input" id="ml-traffic" type="number" placeholder="e.g. 2000" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description for Buyers</label>
+      <textarea class="form-textarea" id="ml-desc" rows="3" placeholder="Why should buyers purchase this site? What's included?"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Tags (comma separated)</label>
+      <input class="form-input" id="ml-tags" placeholder="e.g. profitable, turnkey, established" />
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">
+      <button class="btn btn-secondary" onclick="closeModal('modal-list')">Cancel</button>
+      <button class="btn btn-gold" onclick="submitListing()">🚀 Publish Listing</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Add Lead -->
+<div class="modal-overlay" id="modal-lead">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">👥 Add Buyer Lead</div>
+      <button class="modal-close" onclick="closeModal('modal-lead')">×</button>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input class="form-input" id="lead-name" placeholder="John Smith" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" id="lead-email" type="email" placeholder="john@email.com" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Phone</label>
+        <input class="form-input" id="lead-phone" placeholder="(555) 000-0000" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Budget ($)</label>
+        <input class="form-input" id="lead-budget" type="number" placeholder="10000" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Interested In</label>
+      <input class="form-input" id="lead-interest" placeholder="Site name or category" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Status</label>
+      <select class="form-select" id="lead-status">
+        <option>New</option>
+        <option>Contacted</option>
+        <option>Interested</option>
+        <option>Negotiating</option>
+        <option>Cold</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <textarea class="form-textarea" id="lead-notes" rows="2" placeholder="Any notes about this buyer..."></textarea>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">
+      <button class="btn btn-secondary" onclick="closeModal('modal-lead')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitLead()">Save Lead</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Add Deal -->
+<div class="modal-overlay" id="modal-deal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">🤝 New Deal</div>
+      <button class="modal-close" onclick="closeModal('modal-deal')">×</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Site / Listing</label>
+      <input class="form-input" id="deal-site" placeholder="Site name" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Buyer Name</label>
+        <input class="form-input" id="deal-buyer" placeholder="Buyer name" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Deal Amount ($)</label>
+        <input class="form-input" id="deal-amount" type="number" placeholder="5000" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Stage</label>
+      <select class="form-select" id="deal-stage">
+        <option value="negotiating">Negotiating</option>
+        <option value="due-diligence">Due Diligence</option>
+        <option value="closed">Closed</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <textarea class="form-textarea" id="deal-notes" rows="2"></textarea>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">
+      <button class="btn btn-secondary" onclick="closeModal('modal-deal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitDeal()">Save Deal</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: View Site -->
+<div class="modal-overlay" id="modal-site-view">
+  <div class="modal" style="max-width:800px">
+    <div class="modal-header">
+      <div class="modal-title" id="msv-title">Site Details</div>
+      <button class="modal-close" onclick="closeModal('modal-site-view')">×</button>
+    </div>
+    <div class="grid-2" style="margin-bottom:16px">
+      <div>
+        <div class="form-label">Category</div>
+        <div id="msv-cat" style="margin-top:4px"></div>
+      </div>
+      <div>
+        <div class="form-label">Estimated Value</div>
+        <div id="msv-val" style="margin-top:4px;font-family:var(--font-display);font-size:20px;color:var(--gold)"></div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Generated HTML Code</label>
+      <div class="code-block" id="msv-code" style="max-height:300px"></div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-primary btn-sm" id="msv-preview-btn">👁️ Preview</button>
+      <button class="btn btn-secondary btn-sm" id="msv-copy-btn">📋 Copy Code</button>
+      <button class="btn btn-gold btn-sm" id="msv-list-btn">📋 List for Sale</button>
+      <button class="btn btn-danger btn-sm" id="msv-delete-btn">🗑️ Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOASTS -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ============================================================
+// DATA LAYER — localStorage
+// ============================================================
+const DB = {
+  get(key) { try { return JSON.parse(localStorage.getItem('sf_' + key)) || []; } catch { return []; } },
+  set(key, val) { localStorage.setItem('sf_' + key, JSON.stringify(val)); },
+  getOne(key) { try { return JSON.parse(localStorage.getItem('sf_' + key)) || {}; } catch { return {}; } },
+  setOne(key, val) { localStorage.setItem('sf_' + key, JSON.stringify(val)); }
+};
+
+const getData = () => ({
+  sites: DB.get('sites'),
+  listings: DB.get('listings'),
+  leads: DB.get('leads'),
+  deals: DB.get('deals'),
+  settings: DB.getOne('settings')
+});
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+let currentPage = 'dashboard';
+function navigate(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page)?.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick')?.includes("'" + page + "'")) n.classList.add('active');
+  });
+  currentPage = page;
+  refreshPage(page);
+}
+
+function refreshPage(page) {
+  if (page === 'dashboard') renderDashboard();
+  if (page === 'sites') renderSites();
+  if (page === 'marketplace') renderMarketplace();
+  if (page === 'listings') renderListings();
+  if (page === 'leads') renderLeads();
+  if (page === 'deals') renderDeals();
+  if (page === 'analytics') renderAnalytics();
+  if (page === 'vault') renderVault();
+  if (page === 'settings') loadSettings();
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function toast(msg, type='info') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<span>${msg}</span>`;
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function renderDashboard() {
+  const d = getData();
+  document.getElementById('stat-sites').textContent = d.sites.length;
+  document.getElementById('stat-listings').textContent = d.listings.length;
+  const totalVal = d.sites.reduce((s,x)=>s+(+x.value||0),0);
+  document.getElementById('stat-value').textContent = '$' + totalVal.toLocaleString();
+  document.getElementById('stat-leads').textContent = d.leads.length;
+
+  // Activity
+  const feed = document.getElementById('activity-feed');
+  const allActivity = [
+    ...d.sites.map(s => ({ text: `Site <b>${s.name}</b> created`, time: s.createdAt })),
+    ...d.listings.map(l => ({ text: `<b>${l.siteName}</b> listed for $${(+l.price).toLocaleString()}`, time: l.createdAt })),
+    ...d.leads.map(l => ({ text: `New lead: <b>${l.name}</b>`, time: l.createdAt })),
+    ...d.deals.map(dl => ({ text: `Deal: <b>${dl.site}</b> → ${dl.buyer}`, time: dl.createdAt }))
+  ].sort((a,b) => new Date(b.time)-new Date(a.time)).slice(0,6);
+
+  if (!allActivity.length) {
+    feed.innerHTML = '<div style="text-align:center;color:var(--muted);padding:20px;font-size:13px">No activity yet. Build your first site!</div>';
+  } else {
+    feed.innerHTML = allActivity.map(a => `
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+        <div style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0"></div>
+        <div style="font-size:12px;flex:1">${a.text}</div>
+        <div style="font-size:11px;color:var(--muted)">${fmtDate(a.time)}</div>
+      </div>
+    `).join('');
+  }
+}
+
+// ============================================================
+// AI BUILDER
+// ============================================================
+let generatedHTML = '';
+let currentSiteId = null;
+
+async function generateSite() {
+  const prompt = document.getElementById('sitePrompt').value.trim();
+  const name = document.getElementById('siteName').value.trim() || 'Untitled Site';
+  if (!prompt) { toast('Please describe your website first.', 'error'); return; }
+
+  const btn = document.getElementById('generateBtn');
+  const status = document.getElementById('aiStatus');
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Generating…';
+  status.classList.add('visible');
+  document.getElementById('aiStatusText').textContent = 'Claude is generating your website…';
+  document.getElementById('previewPlaceholder').style.display = 'none';
+
+  const systemPrompt = `You are an expert web developer. Generate a complete, self-contained, beautiful, single-file HTML website based on the user's description.
+
+REQUIREMENTS:
+- Complete HTML document with <!DOCTYPE html> and all CSS/JS inline
+- Professional, modern design — visually stunning
+- Responsive and mobile-friendly
+- Use Google Fonts (load via <link> tag)
+- Include realistic placeholder content
+- Dark or light theme based on context
+- Add subtle animations and hover effects
+- Include ALL sections the user asks for
+- Make it look like it was built by a $15,000 agency
+- Do NOT use external images (use CSS gradients, shapes, emoji instead)
+- Output ONLY the complete HTML code, nothing else, no explanations`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 8000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: `Create a website for: ${name}\n\nDescription: ${prompt}` }]
+      })
+    });
+    const data = await res.json();
+    generatedHTML = data.content?.[0]?.text || '';
+
+    if (!generatedHTML || generatedHTML.includes('error')) {
+      toast('Generation failed. Check your connection.', 'error');
+    } else {
+      // Show preview
+      const frame = document.getElementById('previewFrame');
+      frame.style.display = 'block';
+      frame.srcdoc = generatedHTML;
+      document.getElementById('previewUrl').textContent = name.toLowerCase().replace(/\s+/g,'-') + '.siteforge.io';
+      document.getElementById('fullPreviewBtn').style.display = 'block';
+      document.getElementById('saveGeneratedBtn').style.display = 'flex';
+
+      // Show code
+      const codePanel = document.getElementById('generatedCodePanel');
+      codePanel.style.display = 'block';
+      document.getElementById('codePreview').textContent = generatedHTML.substring(0, 1000) + '\n\n… (full code saved when you click Save)';
+
+      document.getElementById('aiStatusText').textContent = '✅ Website generated successfully!';
+      toast('Website generated! Click "Save to Portfolio" to keep it.', 'success');
+    }
+  } catch(e) {
+    toast('Error: ' + e.message, 'error');
+    document.getElementById('aiStatusText').textContent = '❌ Generation failed.';
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '⚡ Generate with AI';
+}
+
+function saveGeneratedSite() {
+  const name = document.getElementById('siteName').value.trim() || 'Untitled Site';
+  const cat = document.getElementById('siteCategory').value;
+  const val = document.getElementById('siteValue').value || '0';
+  if (!generatedHTML) { toast('Nothing to save yet.', 'error'); return; }
+
+  const site = {
+    id: Date.now().toString(),
+    name, category: cat, value: +val,
+    status: 'draft',
+    html: generatedHTML,
+    prompt: document.getElementById('sitePrompt').value,
+    createdAt: new Date().toISOString()
+  };
+  const sites = DB.get('sites');
+  sites.push(site);
+  DB.set('sites', sites);
+  addActivity(`Site <b>${name}</b> saved to portfolio`);
+  toast(`"${name}" saved to portfolio!`, 'success');
+  document.getElementById('saveGeneratedBtn').style.display = 'none';
+  renderDashboard();
+}
+
+function clearBuilder() {
+  document.getElementById('sitePrompt').value = '';
+  document.getElementById('siteName').value = '';
+  document.getElementById('siteValue').value = '';
+  generatedHTML = '';
+  document.getElementById('previewFrame').style.display = 'none';
+  document.getElementById('previewPlaceholder').style.display = 'flex';
+  document.getElementById('generatedCodePanel').style.display = 'none';
+  document.getElementById('aiStatus').classList.remove('visible');
+  document.getElementById('saveGeneratedBtn').style.display = 'none';
+  document.getElementById('previewUrl').textContent = 'about:blank — generate a site to preview it';
+  document.getElementById('fullPreviewBtn').style.display = 'none';
+}
+
+function copyCode() {
+  if (!generatedHTML) return;
+  navigator.clipboard.writeText(generatedHTML);
+  toast('Code copied!', 'success');
+}
+
+function openFullPreview() {
+  const w = window.open('', '_blank');
+  w.document.write(generatedHTML);
+  w.document.close();
+}
+
+// ============================================================
+// MY SITES
+// ============================================================
+let siteFilter = 'all';
+function filterSites(f, el) {
+  siteFilter = f;
+  document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderSites();
+}
+
+function renderSites() {
+  const sites = DB.get('sites');
+  const filtered = siteFilter === 'all' ? sites : sites.filter(s => s.status === siteFilter);
+  const grid = document.getElementById('siteGrid');
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+      <div class="icon">🌐</div>
+      <h3>No sites${siteFilter !== 'all' ? ' in this filter' : ''}</h3>
+      <p>Use the AI Builder to generate a website.</p>
+      <button class="btn btn-primary" onclick="navigate('builder')">⚡ Build with AI</button>
+    </div>`;
+    return;
+  }
+  grid.innerHTML = filtered.map(s => `
+    <div class="site-card" onclick="viewSite('${s.id}')">
+      <div class="site-thumb">
+        <div class="site-thumb-placeholder">
+          <div class="icon">🌐</div>
+          <div style="font-size:11px">${s.category}</div>
+        </div>
+      </div>
+      <div class="site-info">
+        <div class="site-name">${s.name}</div>
+        <div class="site-url">${s.name.toLowerCase().replace(/\s+/g,'-')}.siteforge.io</div>
+        <div class="site-meta">
+          <span class="site-status ${s.status}">${s.status}</span>
+          <div style="font-size:13px;color:var(--gold);font-weight:700">${s.value ? '$'+Number(s.value).toLocaleString() : '—'}</div>
+        </div>
+        <div style="margin-top:10px;display:flex;gap:6px" onclick="event.stopPropagation()">
+          <button class="btn btn-sm btn-secondary" onclick="previewSite('${s.id}')">👁️</button>
+          <button class="btn btn-sm btn-secondary" onclick="changeSiteStatus('${s.id}','live')">🟢</button>
+          <button class="btn btn-sm btn-gold" onclick="quickList('${s.id}')">💰 List</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteSite('${s.id}')">🗑️</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function viewSite(id) {
+  const sites = DB.get('sites');
+  const s = sites.find(x => x.id === id);
+  if (!s) return;
+  document.getElementById('msv-title').textContent = s.name;
+  document.getElementById('msv-cat').innerHTML = `<span class="badge badge-purple">${s.category}</span>`;
+  document.getElementById('msv-val').textContent = s.value ? '$'+Number(s.value).toLocaleString() : '—';
+  document.getElementById('msv-code').textContent = (s.html || 'No code stored.').substring(0, 2000) + (s.html?.length > 2000 ? '\n…truncated for display' : '');
+  document.getElementById('msv-preview-btn').onclick = () => previewSite(id);
+  document.getElementById('msv-copy-btn').onclick = () => { navigator.clipboard.writeText(s.html||''); toast('Copied!','success'); };
+  document.getElementById('msv-list-btn').onclick = () => { closeModal('modal-site-view'); quickList(id); };
+  document.getElementById('msv-delete-btn').onclick = () => { deleteSite(id); closeModal('modal-site-view'); };
+  openModal('modal-site-view');
+}
+
+function previewSite(id) {
+  const sites = DB.get('sites');
+  const s = sites.find(x => x.id === id);
+  if (!s?.html) { toast('No HTML code for this site.', 'error'); return; }
+  const w = window.open('', '_blank');
+  w.document.write(s.html);
+  w.document.close();
+}
+
+function changeSiteStatus(id, status) {
+  const sites = DB.get('sites');
+  const i = sites.findIndex(s => s.id === id);
+  if (i >= 0) { sites[i].status = status; DB.set('sites', sites); renderSites(); toast('Status updated.', 'success'); }
+}
+
+function deleteSite(id) {
+  if (!confirm('Delete this site? This cannot be undone.')) return;
+  const sites = DB.get('sites').filter(s => s.id !== id);
+  DB.set('sites', sites);
+  renderSites();
+  renderDashboard();
+  toast('Site deleted.', 'info');
+}
+
+function quickList(id) {
+  const sites = DB.get('sites');
+  const s = sites.find(x => x.id === id);
+  if (!s) return;
+  document.getElementById('ml-price').value = s.value || '';
+  populateSiteSelect(id);
+  openModal('modal-list');
+}
+
+// ============================================================
+// LISTINGS
+// ============================================================
+function openListSiteModal() {
+  populateSiteSelect();
+  openModal('modal-list');
+}
+
+function populateSiteSelect(defaultId) {
+  const sites = DB.get('sites');
+  const sel = document.getElementById('ml-site');
+  sel.innerHTML = sites.length
+    ? sites.map(s => `<option value="${s.id}" ${s.id===defaultId?'selected':''}>${s.name}</option>`).join('')
+    : '<option value="">No sites — build one first</option>';
+}
+
+function submitListing() {
+  const siteId = document.getElementById('ml-site').value;
+  const price = document.getElementById('ml-price').value;
+  if (!siteId || !price) { toast('Please fill required fields.', 'error'); return; }
+  const sites = DB.get('sites');
+  const site = sites.find(s => s.id === siteId);
+  const listing = {
+    id: Date.now().toString(),
+    siteId, siteName: site?.name || 'Unknown',
+    category: site?.category || 'Other',
+    price: +price,
+    revenue: +document.getElementById('ml-revenue').value || 0,
+    traffic: +document.getElementById('ml-traffic').value || 0,
+    desc: document.getElementById('ml-desc').value,
+    tags: document.getElementById('ml-tags').value.split(',').map(t=>t.trim()).filter(Boolean),
+    createdAt: new Date().toISOString()
+  };
+  const listings = DB.get('listings');
+  listings.push(listing);
+  DB.set('listings', listings);
+
+  // Update site status
+  const si = sites.findIndex(s => s.id === siteId);
+  if (si >= 0) { sites[si].status = 'listed'; DB.set('sites', sites); }
+
+  closeModal('modal-list');
+  toast(`"${site?.name}" listed for $${Number(price).toLocaleString()}!`, 'success');
+  renderDashboard();
+  renderListings();
+  renderMarketplace();
+}
+
+function renderListings() {
+  const listings = DB.get('listings');
+  const el = document.getElementById('listingsTable');
+  if (!listings.length) {
+    el.innerHTML = `<div class="empty-state"><div class="icon">📋</div><h3>No listings</h3><p>List a site to start attracting buyers.</p><button class="btn btn-gold" onclick="openListSiteModal()">📋 Create Listing</button></div>`;
+    return;
+  }
+  el.innerHTML = `<div class="card"><div class="table-wrap"><table>
+    <thead><tr><th>Site</th><th>Category</th><th>Price</th><th>Revenue/mo</th><th>Traffic/mo</th><th>Tags</th><th>Listed</th><th>Actions</th></tr></thead>
+    <tbody>${listings.map(l => `
+      <tr>
+        <td><b>${l.siteName}</b></td>
+        <td><span class="badge badge-cyan">${l.category}</span></td>
+        <td><b style="color:var(--gold)">$${l.price.toLocaleString()}</b></td>
+        <td>${l.revenue ? '$'+l.revenue.toLocaleString() : '—'}</td>
+        <td>${l.traffic ? l.traffic.toLocaleString() : '—'}</td>
+        <td>${l.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</td>
+        <td style="color:var(--muted)">${fmtDate(l.createdAt)}</td>
+        <td><button class="btn btn-sm btn-danger" onclick="deleteListing('${l.id}')">Remove</button></td>
+      </tr>`).join('')}
+    </tbody></table></div></div>`;
+}
+
+function deleteListing(id) {
+  if (!confirm('Remove this listing?')) return;
+  DB.set('listings', DB.get('listings').filter(l => l.id !== id));
+  renderListings();
+  renderMarketplace();
+  toast('Listing removed.', 'info');
+}
+
+// ============================================================
+// MARKETPLACE
+// ============================================================
+function renderMarketplace() {
+  const listings = DB.get('listings');
+  const filter = document.getElementById('marketFilter')?.value || 'all';
+  const filtered = filter === 'all' ? listings : listings.filter(l => l.category === filter);
+  const el = document.getElementById('marketplaceGrid');
+  if (!filtered.length) {
+    el.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="icon">🏪</div><h3>No listings</h3><p>List your own sites for sale to populate the marketplace.</p><button class="btn btn-primary" onclick="openListSiteModal()">📋 List a Site</button></div>`;
+    return;
+  }
+  el.innerHTML = filtered.map(l => `
+    <div class="listing-card">
+      <div class="listing-header">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div style="font-weight:700;font-size:15px;margin-bottom:4px">${l.siteName}</div>
+            <span class="badge badge-cyan">${l.category}</span>
+          </div>
+          <div class="listing-price">$${l.price.toLocaleString()}</div>
+        </div>
+      </div>
+      <div class="listing-body">
+        <div class="listing-stats">
+          <div class="listing-stat">
+            <div class="listing-stat-val">${l.revenue ? '$'+l.revenue.toLocaleString() : '—'}</div>
+            <div class="listing-stat-lbl">Monthly Revenue</div>
+          </div>
+          <div class="listing-stat">
+            <div class="listing-stat-val">${l.traffic ? l.traffic.toLocaleString() : '—'}</div>
+            <div class="listing-stat-lbl">Monthly Traffic</div>
+          </div>
+        </div>
+        ${l.desc ? `<div style="font-size:12px;color:var(--muted);margin-bottom:12px">${l.desc}</div>` : ''}
+        <div style="margin-bottom:12px">${l.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary btn-sm" style="flex:1" onclick="contactSeller('${l.id}')">📩 Contact Seller</button>
+          <button class="btn btn-secondary btn-sm" onclick="addLeadFromListing('${l.id}')">💾 Save</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function contactSeller(id) {
+  toast('Opening contact form… (add your email in Settings)', 'info');
+}
+
+function addLeadFromListing(id) {
+  const l = DB.get('listings').find(x => x.id === id);
+  if (l) {
+    document.getElementById('lead-interest').value = l.siteName;
+    openModal('modal-lead');
+  }
+}
+
+// ============================================================
+// LEADS
+// ============================================================
+function openAddLeadModal() { openModal('modal-lead'); }
+
+function submitLead() {
+  const name = document.getElementById('lead-name').value.trim();
+  const email = document.getElementById('lead-email').value.trim();
+  if (!name) { toast('Please enter a name.', 'error'); return; }
+  const lead = {
+    id: Date.now().toString(),
+    name, email,
+    phone: document.getElementById('lead-phone').value,
+    budget: document.getElementById('lead-budget').value,
+    interest: document.getElementById('lead-interest').value,
+    status: document.getElementById('lead-status').value,
+    notes: document.getElementById('lead-notes').value,
+    createdAt: new Date().toISOString()
+  };
+  const leads = DB.get('leads');
+  leads.push(lead);
+  DB.set('leads', leads);
+  closeModal('modal-lead');
+  toast('Lead saved!', 'success');
+  renderLeads();
+  renderDashboard();
+  // clear
+  ['lead-name','lead-email','lead-phone','lead-budget','lead-interest','lead-notes'].forEach(id => document.getElementById(id).value = '');
+}
+
+function renderLeads() {
+  const leads = DB.get('leads');
+  const tbody = document.getElementById('leadsTableBody');
+  if (!leads.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:30px">No leads yet.</td></tr>';
+    return;
+  }
+  const statusColors = { New:'badge-cyan', Contacted:'badge-purple', Interested:'badge-gold', Negotiating:'badge-green', Cold:'badge-red' };
+  tbody.innerHTML = leads.map(l => `
+    <tr>
+      <td><b>${l.name}</b></td>
+      <td style="font-family:var(--font-mono);font-size:11px">${l.email}</td>
+      <td>${l.interest || '—'}</td>
+      <td>${l.budget ? '<b style="color:var(--gold)">$'+Number(l.budget).toLocaleString()+'</b>' : '—'}</td>
+      <td><span class="badge ${statusColors[l.status]||'badge-purple'}">${l.status}</span></td>
+      <td style="color:var(--muted)">${fmtDate(l.createdAt)}</td>
+      <td><button class="btn btn-sm btn-danger" onclick="deleteLead('${l.id}')">Remove</button></td>
+    </tr>
+  `).join('');
+}
+
+function deleteLead(id) {
+  DB.set('leads', DB.get('leads').filter(l => l.id !== id));
+  renderLeads();
+  toast('Lead removed.', 'info');
+}
+
+// ============================================================
+// DEALS
+// ============================================================
+function openAddDealModal() { openModal('modal-deal'); }
+
+function submitDeal() {
+  const site = document.getElementById('deal-site').value.trim();
+  const buyer = document.getElementById('deal-buyer').value.trim();
+  const amount = document.getElementById('deal-amount').value;
+  if (!site || !buyer) { toast('Fill in site and buyer name.', 'error'); return; }
+  const deal = {
+    id: Date.now().toString(),
+    site, buyer, amount: +amount,
+    stage: document.getElementById('deal-stage').value,
+    notes: document.getElementById('deal-notes').value,
+    createdAt: new Date().toISOString()
+  };
+  const deals = DB.get('deals');
+  deals.push(deal);
+  DB.set('deals', deals);
+  closeModal('modal-deal');
+  toast('Deal saved!', 'success');
+  renderDeals();
+  renderDashboard();
+}
+
+function renderDeals() {
+  const deals = DB.get('deals');
+  ['negotiating','due-diligence','closed'].forEach(stage => {
+    const col = document.getElementById('col-' + stage);
+    const stagDeals = deals.filter(d => d.stage === stage);
+    if (!stagDeals.length) {
+      col.innerHTML = `<div style="font-size:12px;color:var(--muted);text-align:center;padding:20px;background:var(--surface);border:1px dashed var(--border);border-radius:8px">No deals</div>`;
+      return;
+    }
+    col.innerHTML = stagDeals.map(d => `
+      <div class="card" style="padding:14px;cursor:default">
+        <div style="font-weight:700;margin-bottom:4px">${d.site}</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Buyer: ${d.buyer}</div>
+        ${d.amount ? `<div style="color:var(--gold);font-weight:700;margin-bottom:8px">$${d.amount.toLocaleString()}</div>` : ''}
+        ${d.notes ? `<div style="font-size:11px;color:var(--muted);margin-bottom:8px">${d.notes}</div>` : ''}
+        <div style="display:flex;gap:6px">
+          ${d.stage !== 'closed' ? `<button class="btn btn-sm btn-success" onclick="advanceDeal('${d.id}')">Advance →</button>` : '<span class="badge badge-green">✅ Closed</span>'}
+          <button class="btn btn-sm btn-danger" onclick="deleteDeal('${d.id}')">🗑️</button>
+        </div>
+      </div>
+    `).join('');
+  });
+}
+
+function advanceDeal(id) {
+  const deals = DB.get('deals');
+  const i = deals.findIndex(d => d.id === id);
+  const stages = ['negotiating','due-diligence','closed'];
+  const ci = stages.indexOf(deals[i].stage);
+  if (ci < stages.length - 1) { deals[i].stage = stages[ci + 1]; DB.set('deals', deals); renderDeals(); toast('Deal advanced!', 'success'); }
+}
+
+function deleteDeal(id) {
+  DB.set('deals', DB.get('deals').filter(d => d.id !== id));
+  renderDeals();
+  toast('Deal removed.', 'info');
+}
+
+// ============================================================
+// ANALYTICS
+// ============================================================
+function renderAnalytics() {
+  const d = getData();
+  document.getElementById('an-views').textContent = (d.sites.length * 247).toLocaleString();
+  document.getElementById('an-rev').textContent = d.listings.reduce((s,l)=>s+(l.revenue||0),0) ? '$'+d.listings.reduce((s,l)=>s+(l.revenue||0),0).toLocaleString() : '—';
+  document.getElementById('an-inq').textContent = d.leads.length;
+  document.getElementById('an-deals').textContent = d.deals.filter(d=>d.stage==='closed').length;
+
+  // Category breakdown
+  const cats = {};
+  d.sites.forEach(s => { cats[s.category] = (cats[s.category]||0)+1; });
+  const total = d.sites.length || 1;
+  const cb = document.getElementById('categoryBreakdown');
+  if (!d.sites.length) { cb.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">Build some sites to see breakdown.</div>'; return; }
+  cb.innerHTML = Object.entries(cats).map(([cat,count]) => `
+    <div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <span style="font-size:12px">${cat}</span>
+        <span style="font-size:12px;color:var(--muted)">${count}</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${(count/total*100).toFixed(0)}%"></div></div>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+// DATA VAULT
+// ============================================================
+function renderVault() {
+  const d = getData();
+  document.getElementById('vault-sites').textContent = d.sites.length;
+  document.getElementById('vault-listings').textContent = d.listings.length;
+  document.getElementById('vault-leads').textContent = d.leads.length;
+  document.getElementById('vault-deals').textContent = d.deals.length;
+  renderVaultData();
+}
+
+function renderVaultData() {
+  const key = document.getElementById('vaultTable').value;
+  const data = DB.get(key);
+  document.getElementById('vaultDataView').textContent = JSON.stringify(data, null, 2) || '[]';
+}
+
+function exportData() {
+  const all = {
+    sites: DB.get('sites'),
+    listings: DB.get('listings'),
+    leads: DB.get('leads'),
+    deals: DB.get('deals'),
+    settings: DB.getOne('settings'),
+    exportedAt: new Date().toISOString()
+  };
+  const blob = new Blob([JSON.stringify(all, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'siteforge-backup-' + Date.now() + '.json';
+  a.click();
+  toast('Data exported!', 'success');
+}
+
+function importData() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = e => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (data.sites) DB.set('sites', data.sites);
+        if (data.listings) DB.set('listings', data.listings);
+        if (data.leads) DB.set('leads', data.leads);
+        if (data.deals) DB.set('deals', data.deals);
+        if (data.settings) DB.setOne('settings', data.settings);
+        renderVault();
+        renderDashboard();
+        toast('Data imported successfully!', 'success');
+      } catch { toast('Invalid JSON file.', 'error'); }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function clearAllData() {
+  if (!confirm('⚠️ This will permanently delete ALL your sites, listings, leads, and deals. This cannot be undone.\n\nAre you absolutely sure?')) return;
+  ['sites','listings','leads','deals'].forEach(k => DB.set(k, []));
+  renderDashboard();
+  renderVault();
+  toast('All data cleared.', 'info');
+}
+
+// ============================================================
+// SETTINGS
+// ============================================================
+function loadSettings() {
+  const s = DB.getOne('settings');
+  document.getElementById('set-name').value = s.name || 'Xabdiel';
+  document.getElementById('set-email').value = s.email || '';
+  document.getElementById('set-biz').value = s.biz || 'The Original Granite & Cabinets';
+  document.getElementById('set-bio').value = s.bio || '';
+  document.getElementById('set-contact').value = s.contact || '';
+  document.getElementById('set-payment').value = s.payment || '';
+}
+
+function saveSettings() {
+  DB.setOne('settings', {
+    name: document.getElementById('set-name').value,
+    email: document.getElementById('set-email').value,
+    biz: document.getElementById('set-biz').value,
+    bio: document.getElementById('set-bio').value,
+    contact: document.getElementById('set-contact').value,
+    payment: document.getElementById('set-payment').value
+  });
+  toast('Settings saved!', 'success');
+}
+
+// ============================================================
+// MODALS
+// ============================================================
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+// ============================================================
+// UTILS
+// ============================================================
+function fmtDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function addActivity(text) {
+  // Just a visual helper — dashboard reads from DB
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderDashboard();
+</script>
+</body>
+</html>
